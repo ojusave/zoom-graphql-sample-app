@@ -3,7 +3,7 @@ Script to request an access token to Zoom OAuth endpoint.
 
 ## Installation
 
-`git clone`
+`git clone https://github.com/elisalevet/server2server`
 
 ## Setup
 
