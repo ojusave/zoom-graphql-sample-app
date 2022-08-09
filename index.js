@@ -26,6 +26,21 @@ app.get('/', (req, res) => {
             // Logs your access token and scopes in console
             console.log(`access_token: ${access_token}`);
             console.log(`scope: ${scopes}`)
+            
+            //Make API call to Users/Me with the requested token
+            var options = {
+                'method': 'GET',
+                'url': 'https://api.zoom.us/v2/users/me',
+                'headers': {
+                  'Authorization': `Bearer ${access_token}`
+                },
+                'json' : true
+              };
+              request(options, function (error, response) {
+                if (error) throw new Error(error);
+                //Printing the response in the console
+                console.log(response.body);
+              });
 
         }).auth(process.env.clientID, process.env.clientSecret);
     })
