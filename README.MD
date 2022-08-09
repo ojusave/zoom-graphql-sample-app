@@ -1,5 +1,5 @@
-# jwt-gen
-Utility script to create a Zoom JSON web token (valid 1 hour) and copy it to your clipboard for quick access. 
+# Server to Server OAuth request access token
+Script to request an access token to Zoom OAuth endpoint. 
 
 ## Installation
 
