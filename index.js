@@ -29,20 +29,39 @@ app.get('/', (req, res) => {
         expires_in = body.expires_in.toString(); //converts expires_in to string
 
         //Make API call to using GraphQL API to get a list of Users in your account with the requested token
-        const query = `
-            query {
-              users(first:100) {
-                edges {
-                  id
-                  firstName
-                  lastName
-                  department
-                }
+        const query = ` query {
+            users(first:100) {
+              edges {
+                id
+                firstName
+                lastName
+                department
               }
             }
-        `;
+          }
+          `;
 
-        const options = {
+    const mutation = `mutation createUser {
+        createUser(
+          input: {
+            action: CUST_CREATE,
+            userInfo: {
+              email: "test+4@test.zoom.us", 
+              firstName: "Test",
+              lastName: "User 2", 
+              type: Basic
+            }
+          }
+        ) {
+          email
+          id
+          firstName
+          lastName
+          type
+        }
+      }
+   `;
+            const options = {
             'method': 'POST',
             'url': 'https://api.zoom.us/v3/graphql',
             'headers': {
@@ -52,9 +71,34 @@ app.get('/', (req, res) => {
             'body': JSON.stringify({ query }, null, 2).replace(/\\n/g, '')
         };
 
-        request(options, (error, response, body) => {
+        
+
+        request(options,(error, response, body) => {
             if (error) throw new Error(error);
             api_response = JSON.stringify(JSON.parse(body), null, 2);
+
+        });
+
+            const options2 = {
+                'method': 'POST',
+                'url': 'https://api.zoom.us/v3/graphql',
+                'headers': {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json'
+                },
+                'body': JSON.stringify({ mutation }, null, 2).replace(/\\n/g, '')
+            };
+
+            request(options2,(error, response, body) => {
+                if (error) throw new Error(error);
+                mutation_response = JSON.stringify(JSON.parse(body), null, 2);
+
+                console.log(options)
+                console.log(options2)
+                console.log(api_response)
+                console.log(mutation_response)
+
+
             // Send the API call response to the client
             res.send(`
             <select id="options" onchange="updateTextArea()">
@@ -62,6 +106,7 @@ app.get('/', (req, res) => {
                 <option value="access_token">Access Token</option>
                 <option value="scopes">Scopes</option>
                 <option value="api_response">API Response</option>
+                <option value="mutation_response">Mutation Response </option>
                 
             </select>
             <br>
@@ -80,6 +125,10 @@ app.get('/', (req, res) => {
                         case "api_response":
                             text = \`${JSON.stringify(JSON.parse(api_response), null, 2).replace(/[`\\]/g, '\\\\$&')}\`;
                             break;
+
+                        case "mutation_response":
+                            text = \`${JSON.stringify(JSON.parse(mutation_response), null, 2).replace(/[`\\]/g, '\\\\$&')}\`;
+                            break;
                         
                         default:
                             text = "";
@@ -89,9 +138,9 @@ app.get('/', (req, res) => {
             </script>
             `);
         });
+   
 
     }).auth(process.env.clientID, process.env.clientSecret);
+     } );
 
-});
-
-app.listen(4000, () => console.log(`GraphQL sample app is listening on Port 4000`));
+app.listen(1000, () => console.log(`GraphQL sample app is listening on Port 4000`));
